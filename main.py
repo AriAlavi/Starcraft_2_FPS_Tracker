@@ -1,5 +1,6 @@
 
 from screenReader import GetTimeProcess, GetFpsProcess
+import globalVar
 
 from PIL import Image
 import PIL.ImageOps 
@@ -11,7 +12,7 @@ import time
 import os
 
 
-SIMULATION_SPEED = 1.4 # Slower = .6, Slow = .8, Normal = 1, Fast = 1.2, Faster = 1.4
+
 
 
 
@@ -52,7 +53,7 @@ class TimeGetter():
     def __init__(self):
         self.communicator = multiprocessing.Manager().list([None,])
         self.killer = multiprocessing.Manager().Queue()
-        self.updater = multiprocessing.Process(target=GetTimeProcess, args=(6, .1, self.communicator, self.killer))
+        self.updater = multiprocessing.Process(target=GetTimeProcess, args=(globalVar.THREADS, .1, self.communicator, self.killer))
         self.updater.start()
 
     def Get(self, useFallback):
@@ -70,7 +71,7 @@ class TimeGetter():
 
 
     def _GetTime(self) -> int:
-        return int(time.perf_counter() * SIMULATION_SPEED)
+        return int(time.perf_counter() * globalVar.SIMULATION_SPEED)
 
     def _NewFallback(self, newTime):
         self.lastTime = newTime
@@ -90,7 +91,7 @@ class FPSGetter():
     def __init__(self):
         self.communicator = multiprocessing.Manager().list([None,])
         self.killer = multiprocessing.Manager().Queue()
-        self.updater = multiprocessing.Process(target=GetFpsProcess, args=(6, .1, self.communicator, self.killer))
+        self.updater = multiprocessing.Process(target=GetFpsProcess, args=(globalVar.THREADS, .1, self.communicator, self.killer))
         self.updater.start()
     def Get(self):
         return self.communicator[0]

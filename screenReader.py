@@ -1,11 +1,11 @@
+import globalVar
+
+
 import pyautogui
+
 import time
 from multiprocessing import Pool, Process
 from collections import OrderedDict
-
-# timeRegion = [350, 1035, 460, 1080]
-timeRegion = [350, 1035, 140, 40] # left, top, width, height
-fpsRegion = [2100, 950, 400, 150]
 
 TIME_IMAGE_MAP = {
     "0" : "images/time0.png",
@@ -41,13 +41,13 @@ class FPSLevelFinder():
     topRange = 5
     height = 30
     def __init__(self):
-        ...
+        pyautogui.screenshot(region=globalVar.FPS_REGION).save("fpsRegion.png")
     def Get(self) -> int:
-        foundLevel = pyautogui.locateOnScreen(FPS_IMAGE, grayscale=True, region=fpsRegion, confidence=.91)
+        foundLevel = pyautogui.locateOnScreen(FPS_IMAGE, grayscale=True, region=globalVar.FPS_REGION, confidence=.91)
         if not foundLevel:
             return self.lastResult
         asTop = foundLevel.top - self.topRange
-        asRegion = [x for x in fpsRegion]
+        asRegion = [x for x in globalVar.FPS_REGION]
         asRegion[1] = asTop
         asRegion[2] = asRegion[2]
         asRegion[3] = self.height
@@ -127,6 +127,7 @@ class TimeUpdater():
         self._closed = False
         self.ready = True
         self.lastSecondGot = Buffer(3)
+        pyautogui.screenshot(region=globalVar.TIME_REGION).save("timeRegion.png")
 
     def getTime(self):
         return self.time
@@ -159,7 +160,6 @@ class TimeUpdater():
 
 
 def GetTimeProcess(threads, sleepTime, intPipe, killingPipe):
-    pyautogui.screenshot(region=timeRegion).save("timeRegion.png")
     updater = TimeUpdater(threads)
     while True:
         updater.run()
@@ -170,7 +170,6 @@ def GetTimeProcess(threads, sleepTime, intPipe, killingPipe):
             return
 
 def GetFpsProcess(threads, sleepTime, intPipe, killingPipe):
-    pyautogui.screenshot(region=timeRegion).save("fpsRegion.png")
     updater = FPSFinder(threads)
     while True:
         result = updater.Get()
@@ -180,17 +179,3 @@ def GetFpsProcess(threads, sleepTime, intPipe, killingPipe):
             del updater
             return
 
-
-# def main():
-    # g = FPSFinder(6)
-    # time.sleep(2)
-    # for i in range(1, 10):
-    #     r = g.Get()
-    #     pyautogui.screenshot().save("{}.png".format(r))
-    #     time.sleep(1)
-    
-    # pyautogui.screenshot(region=timeRegion).save("timeRegion.png")
-    # TimeUpdater(6, .1)
-
-# if __name__ == "__main__":
-#     main()
