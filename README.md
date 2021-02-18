@@ -1,1 +1,3 @@
-# Starcraft_2_FPS_Tracker
+# Starcraft 2 FPS Tracker
+
+![Instructions](instructions.png)
